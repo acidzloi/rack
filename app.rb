@@ -1,37 +1,22 @@
 require_relative 'format_time'
+require_relative 'time_handler'
 require 'rack'
 
 class App
   def call(env)
-    @request = Rack::Request.new(env)
-    @format_time = FormatTime.new(@request.params)
-
-    [status, headers, body]
+    Rack::URLMap.new(
+      '/time' => TimeHandler.new,
+      '/' => method(:not_found)
+    ).call(env)
   end
 
   private
 
-  def headers
-    { 'Content-Type' => 'text/plain' }
-  end
-
-  def status
-    return 404 unless format_exist?
-
-    return 400 unless @format_time.params_valid?
-
-    200
-  end
-
-  def body
-    return ["404\n"] unless format_exist?
-
-    @format_time.time
-  end
-
-  def format_exist?
-    return true if @request.params.include?('format')
-
-    false
+  def not_found(_env)
+    [
+      404,
+      { 'Content-Type' => 'text/plain' },
+      ['404 Not Found']
+    ]
   end
 end

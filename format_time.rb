@@ -14,9 +14,7 @@ class FormatTime
   end
 
   def params_valid?
-    return false unless (format_params - VALID_FORMAT.keys).empty?
-
-    true
+    (format_params - VALID_FORMAT.keys).empty?
   end
 
   private
